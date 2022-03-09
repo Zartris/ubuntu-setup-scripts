@@ -84,6 +84,8 @@ if [[ $run_all =~ "y" ]] || ask_user_yn "install basic tools"; then
 	print_subtopic_and_run "Installing openssh-server" "sudo apt install openssh-server -y"
 	print_subtopic_and_run "Installing net-tools" "sudo apt install net-tools -y"
 	print_subtopic_and_run "Installing htop" "sudo apt install htop -y"
+	print_subtopic_and_run "Installing 7zip" "sudo apt-get install p7zip-full"
+	
 	if ask_user_yn "install slack (optional)";then
 		print_subtopic_and_run "Installing slack" "sudo snap install slack --classic"
 	fi
@@ -91,6 +93,7 @@ fi
 
 print_topic "create development directories"
 if [[ $run_all =~ "y" ]] || ask_user_yn "make development folders"; then
+	create_folder_if_not_exists "/home/$USER/lib"
 	create_folder_if_not_exists "/home/$USER/code"
 	create_folder_if_not_exists "/home/$USER/code/python"
 	create_folder_if_not_exists "/home/$USER/code/cpp"
