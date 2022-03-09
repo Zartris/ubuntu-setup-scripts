@@ -49,7 +49,8 @@ create_folder_if_not_exists(){
 }
 
 ask_user_yn(){
-	echo -n "Do you want to run this topic? (y/n)? "
+	text=$1
+	echo -n "Do you want to $1? (y/n)? "
 	read answer
 
 	if [ "$answer" != "${answer#[Yy]}" ] ;then # this grammar (the #[] operator) means that the variable $answer where any Y or y in 1st position will be dropped if they exist.
@@ -64,44 +65,53 @@ run_all=$(echo $1 | tr -d -)
 
 # Update
 print_topic "Updating ubuntu"
-if [[ $run_all =~ "y" ]] || ask_user_yn; then
+if [[ $run_all =~ "y" ]] || ask_user_yn "update ubuntu"; then
 	sudo apt update 
 	sudo apt-get update
 fi 
 
 # To enable nvidia drivers
 print_topic "Updating drivers"
-if [[ $run_all =~ "y" ]] || ask_user_yn; then
+if [[ $run_all =~ "y" ]] || ask_user_yn "update drivers"; then
 	print_subtopic_and_run "Enable display drivers" "sudo ubuntu-drivers autoinstall"
+	print_subtopic_and_run "install gpu utils" "sudo apt install nvidia-driver-510 nvidia-utils-510"
 fi
 
 print_topic "Installing tools"
-if [[ $run_all =~ "y" ]] || ask_user_yn; then
+if [[ $run_all =~ "y" ]] || ask_user_yn "install basic tools"; then
 	print_subtopic_and_run "Installing termiator" "sudo apt install terminator -y"
 	print_subtopic_and_run "Installing git" "sudo apt install git -y"
 	print_subtopic_and_run "Installing openssh-server" "sudo apt install openssh-server -y"
 	print_subtopic_and_run "Installing net-tools" "sudo apt install net-tools -y"
+	print_subtopic_and_run "Installing htop" "sudo apt install htop -y"
+	if ask_user_yn "install slack (optional)";then
+		print_subtopic_and_run "Installing slack" "sudo snap install slack --classic"
+	fi
 fi
 
-print_topic "make development directories"
-if [[ $run_all =~ "y" ]] || ask_user_yn; then
+print_topic "create development directories"
+if [[ $run_all =~ "y" ]] || ask_user_yn "make development folders"; then
 	create_folder_if_not_exists "/home/$USER/code"
 	create_folder_if_not_exists "/home/$USER/code/python"
 	create_folder_if_not_exists "/home/$USER/code/cpp"
 	create_folder_if_not_exists "/home/$USER/code/ros_ws"
+	create_folder_if_not_exists "/home/$USER/code/shell"
+	if not_exists "/home/$USER/code/shell/ubuntu-setup-scripts"; then
+		cd /home/$USER/code/shell/
+		git clone https://github.com/Zartris/ubuntu-setup-scripts
+	fi
+fi
+print_topic "setup development variables"
+if [[ $run_all =~ "y" ]] || ask_user_yn "add git alias (status=st)";then
+	print_subtopic_and_run "setting git alias" "git config --global alias.st status"
 fi
 
 
-
-
 echo ""
 echo ""
 echo ""
 echo ""
-echo "Done with the setup script, to complete it please reboot"
-
-
-
-
-
-
+echo "Done with the setup script, to complete apply settings please reboot"
+if ask_user_yn "reboot now"; then
+	reboot
+fi
