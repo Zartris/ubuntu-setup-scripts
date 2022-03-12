@@ -89,6 +89,12 @@ if [[ $run_all =~ "y" ]] || ask_user_yn "install basic tools"; then
 	if ask_user_yn "install slack (optional)";then
 		print_subtopic_and_run "Installing slack" "sudo snap install slack --classic"
 	fi
+	if ask_user_yn "install blender (optional)";then
+		print_subtopic_and_run "Installing blender" "sudo snap install blender --classic"
+	fi
+	if ask_user_yn "install vs-code (optional)";then
+		print_subtopic_and_run "Installing vs-code" "sudo snap install code --classic"
+	fi
 fi
 
 print_topic "create development directories"
@@ -108,7 +114,11 @@ print_topic "setup development variables"
 if [[ $run_all =~ "y" ]] || ask_user_yn "add git alias (status=st)";then
 	print_subtopic_and_run "setting git alias" "git config --global alias.st status"
 fi
-
+if [[ $run_all =~ "y" ]] || ask_user_yn "add newline to terminal";then
+	echo "# Customize bash to start on new line:" >> /home/$USER/.bashrc
+	echo "PS1='\${debian_chroot:+(\$debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n>'" >> /home/$USER/.bashrc
+	echo "" >> /home/$USER/.bashrc
+fi
 
 echo ""
 echo ""
